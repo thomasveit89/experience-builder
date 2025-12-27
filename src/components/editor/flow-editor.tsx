@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Eye, Settings, Share2, MoreVertical, Trash2 } from 'lucide-react';
 import { NodeList } from './node-list';
+import { LivePreview } from './live-preview';
 import { ThemeSelector } from './theme-selector';
 import { PublishDialog } from './publish-dialog';
 import { deleteProjectAction } from '@/app/actions/nodes';
@@ -29,6 +30,7 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
   const router = useRouter();
   const [project, setProject] = useState(initialProject);
   const [nodes, setNodes] = useState(initialNodes);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -64,21 +66,18 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold">{project.title}</h1>
+            <h1 className="text-2xl font-bold">{project.title}</h1>
             {project.published ? (
               <Badge variant="success">Published</Badge>
             ) : (
               <Badge variant="warning">Draft</Badge>
             )}
           </div>
-          {project.description && (
-            <p className="text-muted-foreground">{project.description}</p>
-          )}
           <div className="flex items-center gap-2 text-sm">
             <Badge variant="outline" className="capitalize">
               {project.theme.replace('-', ' ')}
@@ -89,15 +88,15 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setShowThemeSelector(true)}>
+          <Button variant="outline" size="sm" onClick={() => setShowThemeSelector(true)}>
             <Settings className="mr-2 h-4 w-4" />
             Theme
           </Button>
-          <Button variant="outline" onClick={handlePreview}>
+          <Button variant="outline" size="sm" onClick={handlePreview}>
             <Eye className="mr-2 h-4 w-4" />
-            Preview
+            Full Preview
           </Button>
-          <Button onClick={() => setShowPublishDialog(true)}>
+          <Button size="sm" onClick={() => setShowPublishDialog(true)}>
             <Share2 className="mr-2 h-4 w-4" />
             {project.published ? 'Share' : 'Publish'}
           </Button>
@@ -118,15 +117,43 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
         </div>
       </div>
 
-      {/* Node List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Flow Screens ({nodes.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <NodeList nodes={nodes} projectId={project.id} onNodesChange={setNodes} />
-        </CardContent>
-      </Card>
+      {/* Split Screen: Node List + Live Preview */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6 pt-6 overflow-hidden">
+        {/* Left: Node List (1/3) */}
+        <div className="flex flex-col overflow-hidden">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Screens ({nodes.length})</h2>
+            <p className="text-sm text-muted-foreground">Click a screen to preview it</p>
+          </div>
+          <div className="flex-1 overflow-y-auto pr-2">
+            <NodeList
+              nodes={nodes}
+              projectId={project.id}
+              onNodesChange={setNodes}
+              currentSlideIndex={currentSlideIndex}
+              onSlideClick={setCurrentSlideIndex}
+            />
+          </div>
+        </div>
+
+        {/* Right: Live Preview */}
+        <div className="flex flex-col overflow-hidden border-l pl-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Live Preview</h2>
+            <p className="text-sm text-muted-foreground">
+              Screen {currentSlideIndex + 1} of {nodes.length}
+            </p>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <LivePreview
+              project={project}
+              nodes={nodes}
+              currentSlideIndex={currentSlideIndex}
+              onSlideChange={setCurrentSlideIndex}
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Dialogs */}
       <ThemeSelector

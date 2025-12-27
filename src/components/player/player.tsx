@@ -29,6 +29,14 @@ export function Player({ project, nodes }: PlayerProps) {
   const currentNode = nodes[currentIndex];
   const progress = ((currentIndex + 1) / nodes.length) * 100;
 
+  // Theme-aware progress bar gradients
+  const progressGradients = {
+    'playful-pastel': 'from-pink-400 via-purple-400 to-blue-400',
+    'elegant-dark': 'from-purple-600 via-amber-400 to-purple-500',
+    'warm-mediterranean': 'from-orange-500 via-teal-500 to-amber-500',
+    'minimal-zen': 'from-gray-700 via-gray-800 to-gray-900',
+  };
+
   // Extract attribution from current node based on type
   const getAttribution = (): string | null => {
     if (currentNode.type === 'hero' && currentNode.content.backgroundImage?.attribution) {
@@ -129,18 +137,21 @@ export function Player({ project, nodes }: PlayerProps) {
   }, [answers, sessionId, currentIndex, nodes.length]);
 
   const slideVariants = {
-    enter: (direction: string) => ({
-      x: direction === 'forward' ? '100%' : '-100%',
+    enter: {
       opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
+      scale: 1.02,
+      filter: 'blur(4px)',
     },
-    exit: (direction: string) => ({
-      x: direction === 'forward' ? '-100%' : '100%',
+    center: {
+      opacity: 1,
+      scale: 1,
+      filter: 'blur(0px)',
+    },
+    exit: {
       opacity: 0,
-    }),
+      scale: 0.98,
+      filter: 'blur(4px)',
+    },
   };
 
   const renderScreen = () => {
@@ -152,7 +163,7 @@ export function Player({ project, nodes }: PlayerProps) {
       case 'text-input':
         return <TextInputScreen node={currentNode} onAnswer={handleAnswer} />;
       case 'reveal':
-        return <RevealScreen node={currentNode} onNext={handleNext} />;
+        return <RevealScreen node={currentNode} onNext={handleNext} theme={project.theme} />;
       case 'media':
         return <MediaScreen node={currentNode} onNext={handleNext} />;
       default:
@@ -164,22 +175,25 @@ export function Player({ project, nodes }: PlayerProps) {
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
       {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <Progress value={progress} className="h-1 rounded-none" />
+        <Progress
+          value={progress}
+          className="h-2 rounded-none"
+          indicatorClassName={`bg-linear-to-r ${progressGradients[project.theme]}`}
+        />
       </div>
 
       {/* Screen content */}
       <div className="min-h-screen flex items-center justify-center p-4 pt-8">
-        <AnimatePresence mode="wait" custom={direction}>
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            custom={direction}
             variants={slideVariants}
             initial="enter"
             animate="center"
             exit="exit"
             transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 },
+              duration: 0.5,
+              ease: [0.43, 0.13, 0.23, 0.96],
             }}
             className="w-full max-w-2xl"
           >

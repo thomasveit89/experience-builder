@@ -199,4 +199,19 @@
   .animate-shimmer {
     animation: shimmer 2s infinite;
   }
+
+  /* Ken Burns effect for background images */
+  @keyframes kenBurns {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+
+    100% {
+      transform: scale(1.1) translate(-2%, -2%);
+    }
+  }
+
+  .animate-kenBurns {
+    animation: kenBurns 20s ease-out forwards;
+  }
 }

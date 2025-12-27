@@ -13,9 +13,11 @@ interface NodeListProps {
   nodes: any[];
   projectId: string;
   onNodesChange: (nodes: any[]) => void;
+  currentSlideIndex?: number;
+  onSlideClick?: (index: number) => void;
 }
 
-export function NodeList({ nodes, projectId, onNodesChange }: NodeListProps) {
+export function NodeList({ nodes, projectId, onNodesChange, currentSlideIndex, onSlideClick }: NodeListProps) {
   const [editingNode, setEditingNode] = useState<any | null>(null);
   const [deletingNodeId, setDeletingNodeId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -167,53 +169,63 @@ export function NodeList({ nodes, projectId, onNodesChange }: NodeListProps) {
         onReorder={handleReorder}
         className="space-y-2"
       >
-        {nodes.map((node, index) => (
-          <Reorder.Item key={node.id} value={node}>
-            <Card className="p-4 cursor-grab active:cursor-grabbing">
-              <div className="flex items-center gap-4">
-                <div className="text-muted-foreground touch-none">
-                  <GripVertical className="h-5 w-5" />
-                </div>
+        {nodes.map((node, index) => {
+          const isActive = currentSlideIndex === index;
+          return (
+            <Reorder.Item key={node.id} value={node}>
+              <Card
+                className={`p-4 cursor-pointer transition-all ${isActive
+                    ? 'border-1 border-primary bg-primary/5'
+                    : 'hover:bg-muted/50'
+                  }`}
+                onClick={() => onSlideClick?.(index)}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-muted-foreground touch-none cursor-grab active:cursor-grabbing"
+                    onPointerDown={(e) => e.stopPropagation()}>
+                    <GripVertical className="h-5 w-5" />
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{getNodeIcon(node.type)}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-muted-foreground">
-                          {index + 1}.
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          {getNodeLabel(node.type)}
-                        </span>
+                  <div className="flex-1 min-w-0 pointer-events-none">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{getNodeIcon(node.type)}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">
+                            {index + 1}.
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {getNodeLabel(node.type)}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium truncate">{getNodePreview(node)}</p>
                       </div>
-                      <p className="text-sm font-medium truncate">{getNodePreview(node)}</p>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEdit(node)}
-                    disabled={isDragging}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(node.id)}
-                    disabled={deletingNodeId === node.id || isDragging}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(node)}
+                      disabled={isDragging}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(node.id)}
+                      disabled={deletingNodeId === node.id || isDragging}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </Reorder.Item>
-        ))}
+              </Card>
+            </Reorder.Item>
+          );
+        })}
       </Reorder.Group>
 
       {editingNode && (

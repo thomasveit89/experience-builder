@@ -30,11 +30,11 @@ export function HeroScreen({ node, onNext }: HeroScreenProps) {
               src={backgroundImage.url}
               alt={backgroundImage.alt}
               fill
-              className="object-cover"
+              className="object-cover animate-kenBurns"
               priority
             />
           </div>
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/40 to-black/60" />
         </>
       )}
 

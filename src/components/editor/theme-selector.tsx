@@ -70,9 +70,8 @@ export function ThemeSelector({
           {Object.entries(themes).map(([key, theme]) => (
             <Card
               key={key}
-              className={`p-4 cursor-pointer transition-all ${
-                selectedTheme === key ? 'ring-2 ring-primary' : ''
-              }`}
+              className={`p-4 cursor-pointer transition-all ${selectedTheme === key ? 'border border-primary' : ''
+                }`}
               onClick={() => setSelectedTheme(key)}
             >
               <div className="flex items-start justify-between mb-3">

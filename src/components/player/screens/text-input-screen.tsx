@@ -43,7 +43,7 @@ export function TextInputScreen({ node, onAnswer }: TextInputScreenProps) {
           <span className="text-sm text-muted-foreground">
             {value.length} / {maxLength} characters
           </span>
-          <Button type="submit" size="lg" disabled={!value.trim()}>
+          <Button type="submit" size="xl" disabled={!value.trim()}>
             Continue
           </Button>
         </div>

@@ -15,6 +15,7 @@ import { publishProjectAction, unpublishProjectAction } from '@/app/actions/node
 import { toast } from 'sonner';
 import { Check, Copy, ExternalLink, Loader2, Lock } from 'lucide-react';
 import { Project } from '@/types/flow';
+import { AlertDialogConfirm } from '@/components/ui/alert-dialog-confirm';
 
 interface PublishDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ interface PublishDialogProps {
 export function PublishDialog({ open, onClose, project, onPublished }: PublishDialogProps) {
   const [publishing, setPublishing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showUnpublishDialog, setShowUnpublishDialog] = useState(false);
 
   const shareUrl = project.shareSlug
     ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/play/${project.shareSlug}`
@@ -46,11 +48,11 @@ export function PublishDialog({ open, onClose, project, onPublished }: PublishDi
     setPublishing(false);
   };
 
-  const handleUnpublish = async () => {
-    if (!confirm('Are you sure you want to unpublish this gift? The link will stop working.')) {
-      return;
-    }
+  const handleUnpublishClick = () => {
+    setShowUnpublishDialog(true);
+  };
 
+  const handleUnpublishConfirm = async () => {
     setPublishing(true);
 
     const result = await unpublishProjectAction(project.id);
@@ -84,7 +86,18 @@ export function PublishDialog({ open, onClose, project, onPublished }: PublishDi
   if (project.published && shareUrl) {
     // Already published - show share options
     return (
-      <Dialog open={open} onOpenChange={onClose}>
+      <>
+        <AlertDialogConfirm
+          open={showUnpublishDialog}
+          onOpenChange={setShowUnpublishDialog}
+          onConfirm={handleUnpublishConfirm}
+          title="Unpublish this gift?"
+          description="The share link will stop working and your recipient won't be able to access it anymore. You can always publish it again later."
+          confirmText="Unpublish"
+          cancelText="Cancel"
+          variant="destructive"
+        />
+        <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Share Your Gift</DialogTitle>
@@ -114,7 +127,7 @@ export function PublishDialog({ open, onClose, project, onPublished }: PublishDi
 
             <div className="pt-4 border-t">
               <Button
-                onClick={handleUnpublish}
+                onClick={handleUnpublishClick}
                 variant="destructive"
                 className="w-full"
                 disabled={publishing}
@@ -135,6 +148,7 @@ export function PublishDialog({ open, onClose, project, onPublished }: PublishDi
           </div>
         </DialogContent>
       </Dialog>
+      </>
     );
   }
 

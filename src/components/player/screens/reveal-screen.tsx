@@ -184,7 +184,7 @@ export function RevealScreen({ node, onNext, theme = 'playful-pastel', disableCo
           style={{ transitionDelay: '2200ms' }}
         >
           {cta && (
-            <Button size="lg" asChild className="shadow-lg">
+            <Button size="xl" asChild className="shadow-lg">
               <a href={cta.url} target="_blank" rel="noopener noreferrer">
                 {cta.label}
               </a>
@@ -192,12 +192,12 @@ export function RevealScreen({ node, onNext, theme = 'playful-pastel', disableCo
           )}
           <Button
             variant={cta ? 'outline' : 'default'}
-            size="lg"
+            size="xl"
             onClick={onNext}
             className={hasValidImage ? 'bg-white/10 hover:bg-white/20 text-white border-white/30' : ''}
           >
             Continue
-            <ChevronRight className="ml-2 h-4 w-4" />
+            <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </div>

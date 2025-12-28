@@ -47,7 +47,7 @@ export function ChoiceScreen({ node, onAnswer }: ChoiceScreenProps) {
             <Button
               key={option.id}
               variant={isSelected ? 'default' : 'outline'}
-              size="lg"
+              size="xl"
               className="h-auto min-h-[4rem] py-4 px-6 text-lg font-medium relative whitespace-normal text-left"
               onClick={() => handleOptionClick(option.id)}
             >
@@ -64,7 +64,7 @@ export function ChoiceScreen({ node, onAnswer }: ChoiceScreenProps) {
 
       {allowMultiple && selected.length > 0 && (
         <div className="text-center pt-4">
-          <Button size="lg" onClick={handleSubmit} className="min-w-[200px]">
+          <Button size="xl" onClick={handleSubmit} className="min-w-[200px]">
             Continue ({selected.length} selected)
           </Button>
         </div>

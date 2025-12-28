@@ -179,7 +179,7 @@ function PreviewFrame({
         color: theme.colors.foreground,
       }}
     >
-      <div className="transform md:scale-80">
+      <div className="w-full max-w-2xl mx-auto transform md:scale-80">
         {renderScreen()}
       </div>
     </div>

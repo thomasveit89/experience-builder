@@ -55,9 +55,9 @@ export function HeroScreen({ node, onNext }: HeroScreenProps) {
           </p>
         )}
 
-        <Button size="lg" onClick={onNext} className="mt-4">
+        <Button size="xl" onClick={onNext} className="mt-4">
           Continue
-          <ChevronRight className="ml-2 h-4 w-4" />
+          <ChevronRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
     </Card>

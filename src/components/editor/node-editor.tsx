@@ -132,17 +132,6 @@ export function NodeEditor({ node, open, onClose, onSave }: NodeEditorProps) {
                 placeholder="Enter placeholder text..."
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="maxLength">Max Length</Label>
-              <Input
-                id="maxLength"
-                type="number"
-                value={content.maxLength || 200}
-                onChange={(e) => updateField('maxLength', parseInt(e.target.value))}
-                min={1}
-                max={500}
-              />
-            </div>
           </div>
         );
 

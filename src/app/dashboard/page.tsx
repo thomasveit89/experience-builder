@@ -61,7 +61,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projectsWithCounts.map((project) => (
             <Link key={project.id} href={`/dashboard/projects/${project.id}`}>
-              <Card className="hover:border-primary transition-all cursor-pointer h-full">
+              <Card className="hover:bg-gray-100/50 hover:border-gray-200 transition-all cursor-pointer h-full">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle>{project.title}</CardTitle>

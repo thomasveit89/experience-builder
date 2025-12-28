@@ -20,6 +20,7 @@ import { PublishDialog } from './publish-dialog';
 import { deleteProjectAction } from '@/app/actions/nodes';
 import { toast } from 'sonner';
 import type { Project } from '@/types/flow';
+import { AlertDialogConfirm } from '@/components/ui/alert-dialog-confirm';
 
 interface FlowEditorProps {
   project: Project;
@@ -33,6 +34,7 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const handlePreview = () => {
@@ -48,11 +50,11 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
     setProject({ ...project, published: true, shareSlug });
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
 
+  const handleDeleteConfirm = async () => {
     setDeleting(true);
     const result = await deleteProjectAction(project.id);
 
@@ -66,8 +68,20 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
+    <>
+      <AlertDialogConfirm
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeleteConfirm}
+        title="Delete this gift?"
+        description="This will permanently delete your gift and all its screens. This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+
+      <div className="flex flex-col h-full">
+        {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pb-6 border-b">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
@@ -108,7 +122,7 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+              <DropdownMenuItem onClick={handleDeleteClick} className="text-destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Gift
               </DropdownMenuItem>
@@ -170,6 +184,7 @@ export function FlowEditor({ project: initialProject, nodes: initialNodes }: Flo
         project={project}
         onPublished={handlePublished}
       />
-    </div>
+      </div>
+    </>
   );
 }

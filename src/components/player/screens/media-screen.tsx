@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
@@ -20,9 +21,15 @@ export function MediaScreen({ node, onNext }: MediaScreenProps) {
     !image.url.startsWith('UNSPLASH:') &&
     image.url.startsWith('http');
 
-  // If no valid image, skip this screen
+  // If no valid image, skip this screen using useEffect to avoid updating during render
+  useEffect(() => {
+    if (!hasValidImage) {
+      onNext();
+    }
+  }, [hasValidImage, onNext]);
+
+  // If no valid image, show nothing (will auto-skip via useEffect)
   if (!hasValidImage) {
-    onNext();
     return null;
   }
 
@@ -45,9 +52,9 @@ export function MediaScreen({ node, onNext }: MediaScreenProps) {
       )}
 
       <div className="text-center pt-4">
-        <Button size="lg" onClick={onNext}>
+        <Button size="xl" onClick={onNext}>
           Continue
-          <ChevronRight className="ml-2 h-4 w-4" />
+          <ChevronRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
     </Card>

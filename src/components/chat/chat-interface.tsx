@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { themes } from '@/config/themes';
 import type { Theme } from '@/types/flow';
 import { GenerationLoadingScreen } from './generation-loading-screen';
+import { AlertDialogConfirm } from '@/components/ui/alert-dialog-confirm';
 
 interface ExamplePrompt {
   id: string;
@@ -138,6 +139,8 @@ export function ChatInterface() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showReplaceDialog, setShowReplaceDialog] = useState(false);
+  const [pendingPrompt, setPendingPrompt] = useState('');
   const router = useRouter();
 
   // Group examples by category (memoized for performance)
@@ -172,7 +175,21 @@ export function ChatInterface() {
   };
 
   const handleExampleClick = (prompt: string) => {
+    // If user has already typed something, ask for confirmation before replacing
+    if (input.trim()) {
+      setPendingPrompt(prompt);
+      setShowReplaceDialog(true);
+      return;
+    }
+
     setInput(prompt);
+    // Scroll to textarea and focus
+    document.querySelector('textarea')?.focus();
+  };
+
+  const handleConfirmReplace = () => {
+    setInput(pendingPrompt);
+    setPendingPrompt('');
     // Scroll to textarea and focus
     document.querySelector('textarea')?.focus();
   };
@@ -193,6 +210,17 @@ export function ChatInterface() {
 
   return (
     <>
+      {/* Confirmation Dialog */}
+      <AlertDialogConfirm
+        open={showReplaceDialog}
+        onOpenChange={setShowReplaceDialog}
+        onConfirm={handleConfirmReplace}
+        title="Replace existing text?"
+        description="You already have text in the input. Do you want to replace it with this example?"
+        confirmText="Replace"
+        cancelText="Keep my text"
+      />
+
       {/* Full-screen Loading Animation */}
       <GenerationLoadingScreen isVisible={loading} />
 
@@ -370,34 +398,17 @@ function ExampleCard({ example, onClick, getThemeColors, getThemeDisplayName }: 
     >
 
 
-      <div className="relative z-10 p-6 space-y-3 flex flex-col h-full">
+      <div className="relative z-10 p-4 space-y-2.5 flex flex-col h-full">
         {/* Header */}
         <span className="text-4xl">{example.emoji}</span>
 
         {/* Title */}
-        <h3 className="font-semibold text-sm">{example.title}</h3>
+        <h3 className="font-semibold text-base">{example.title}</h3>
 
         {/* Prompt preview */}
-        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed grow">
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed grow">
           {example.prompt}
         </p>
-
-        {/* Theme indicator */}
-        <div className="flex items-center gap-2 pt-2 border-t border-border/50">
-          <div className="flex gap-1">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ background: themeColors.primary }}
-            />
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ background: themeColors.secondary }}
-            />
-          </div>
-          <span className="text-xs text-muted-foreground capitalize">
-            {getThemeDisplayName(example.theme)}
-          </span>
-        </div>
       </div>
     </Card>
   );

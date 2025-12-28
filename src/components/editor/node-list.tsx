@@ -8,6 +8,7 @@ import { Reorder, useDragControls } from 'framer-motion';
 import { NodeEditor } from './node-editor';
 import { deleteNodeAction, reorderNodesAction } from '@/app/actions/nodes';
 import { toast } from 'sonner';
+import { AlertDialogConfirm } from '@/components/ui/alert-dialog-confirm';
 
 interface NodeListProps {
   nodes: any[];
@@ -20,23 +21,31 @@ interface NodeListProps {
 export function NodeList({ nodes, projectId, onNodesChange, currentSlideIndex, onSlideClick }: NodeListProps) {
   const [editingNode, setEditingNode] = useState<any | null>(null);
   const [deletingNodeId, setDeletingNodeId] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [nodeToDelete, setNodeToDelete] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const pendingReorderRef = useRef<any[] | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleDelete = async (nodeId: string) => {
-    if (!confirm('Are you sure you want to delete this screen?')) return;
+  const handleDeleteClick = (nodeId: string) => {
+    setNodeToDelete(nodeId);
+    setShowDeleteDialog(true);
+  };
 
-    setDeletingNodeId(nodeId);
-    const result = await deleteNodeAction(nodeId, projectId);
+  const handleDeleteConfirm = async () => {
+    if (!nodeToDelete) return;
+
+    setDeletingNodeId(nodeToDelete);
+    const result = await deleteNodeAction(nodeToDelete, projectId);
 
     if (result.success) {
-      onNodesChange(nodes.filter((n) => n.id !== nodeId));
+      onNodesChange(nodes.filter((n) => n.id !== nodeToDelete));
       toast.success('Screen deleted successfully');
     } else {
       toast.error(result.error || 'Failed to delete screen');
     }
     setDeletingNodeId(null);
+    setNodeToDelete(null);
   };
 
   const handleEdit = (node: any) => {
@@ -163,6 +172,17 @@ export function NodeList({ nodes, projectId, onNodesChange, currentSlideIndex, o
 
   return (
     <>
+      <AlertDialogConfirm
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeleteConfirm}
+        title="Delete this screen?"
+        description="This screen will be permanently removed from your gift. This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+      />
+
       <Reorder.Group
         axis="y"
         values={nodes}
@@ -175,8 +195,8 @@ export function NodeList({ nodes, projectId, onNodesChange, currentSlideIndex, o
             <Reorder.Item key={node.id} value={node}>
               <Card
                 className={`p-4 cursor-pointer transition-all ${isActive
-                    ? 'border-1 border-primary bg-primary/5'
-                    : 'hover:bg-muted/50'
+                  ? 'bg-gray-100 border border-gray-300'
+                  : 'hover:bg-gray-100/50 hover:border-gray-200'
                   }`}
                 onClick={() => onSlideClick?.(index)}
               >
@@ -215,7 +235,7 @@ export function NodeList({ nodes, projectId, onNodesChange, currentSlideIndex, o
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDelete(node.id)}
+                      onClick={() => handleDeleteClick(node.id)}
                       disabled={deletingNodeId === node.id || isDragging}
                     >
                       <Trash2 className="h-4 w-4" />

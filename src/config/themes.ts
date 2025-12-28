@@ -123,7 +123,7 @@ export const themes: Record<Theme, ThemeConfig> = {
       primaryForeground: 'hsl(0, 0%, 100%)',   // White text
       secondary: 'hsl(0, 0%, 35%)',            // Medium gray
       secondaryForeground: 'hsl(0, 0%, 100%)', // White text
-      background: 'hsl(0, 0%, 99%)',           // Off-white
+      background: 'hsl(0, 0%, 97%)',           // Off-white
       foreground: 'hsl(0, 0%, 8%)',            // Near black text
       muted: 'hsl(0, 0%, 92%)',                // Light gray
       mutedForeground: 'hsl(0, 0%, 45%)',      // Medium gray

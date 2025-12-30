@@ -9,45 +9,72 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function LoginPage() {
-  const t = useTranslations('auth.login');
+export default function SignupPage() {
+  const t = useTranslations('auth.signup');
   const tApp = useTranslations('app');
   const params = useParams();
   const locale = params.locale as string;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
   const supabase = createClient();
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    // Validate password match
+    if (password !== confirmPassword) {
+      setError(t('passwordMismatch'));
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError(t('passwordTooShort'));
+      setLoading(false);
+      return;
+    }
+
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
     if (authError) {
-      console.error('Login error:', authError);
-      setError(t('invalidCredentials'));
+      console.error('Signup error:', authError);
+      setError(t('signupError'));
       setLoading(false);
     } else {
-      // Redirect to dashboard
-      window.location.href = `/${locale}/dashboard`;
+      // Check if email confirmation is required
+      if (data?.user && !data.session) {
+        // Email confirmation required
+        setEmailSent(true);
+        setLoading(false);
+      } else {
+        // Auto-confirmed, redirect to dashboard
+        window.location.href = `/${locale}/dashboard`;
+      }
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleSignup = async () => {
     setLoading(true);
     setError(null);
 
@@ -59,11 +86,45 @@ export default function LoginPage() {
     });
 
     if (authError) {
-      console.error('Google login error:', authError);
+      console.error('Google signup error:', authError);
       setError(t('googleError'));
       setLoading(false);
     }
   };
+
+  // Show email confirmation screen if email was sent
+  if (emailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 text-6xl">📧</div>
+            <CardTitle className="text-2xl">{t('checkEmailTitle')}</CardTitle>
+            <CardDescription className="text-base">
+              {t('checkEmailMessage')} <strong>{email}</strong>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground text-center">
+              {t('checkEmailDescription')}
+            </p>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setEmailSent(false);
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+              }}
+            >
+              {t('useDifferentEmail')}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -80,7 +141,7 @@ export default function LoginPage() {
             />
           </div>
           <CardDescription className="text-base">
-            {tApp('tagline')}
+            {t('subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -89,7 +150,7 @@ export default function LoginPage() {
             type="button"
             variant="outline"
             className="w-full h-11"
-            onClick={handleGoogleLogin}
+            onClick={handleGoogleSignup}
             disabled={loading}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -125,7 +186,7 @@ export default function LoginPage() {
           </div>
 
           {/* Email/Password Form */}
-          <form onSubmit={handleEmailLogin} className="space-y-4">
+          <form onSubmit={handleEmailSignup} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">
                 {t('emailLabel')}
@@ -143,23 +204,35 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium">
-                  {t('passwordLabel')}
-                </label>
-                <Link
-                  href={`/${locale}/auth/forgot-password`}
-                  className="text-xs text-primary hover:underline"
-                >
-                  {t('forgotPassword')}
-                </Link>
-              </div>
+              <label htmlFor="password" className="text-sm font-medium">
+                {t('passwordLabel')}
+              </label>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                className="h-11"
+                minLength={6}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('passwordHint')}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="confirmPassword" className="text-sm font-medium">
+                {t('confirmPasswordLabel')}
+              </label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={loading}
                 className="h-11"
@@ -174,19 +247,23 @@ export default function LoginPage() {
             )}
 
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? t('signingInButton') : t('signInButton')}
+              {loading ? t('creatingAccountButton') : t('createAccountButton')}
             </Button>
           </form>
 
           <div className="text-center text-sm">
-            <span className="text-muted-foreground">{t('noAccount')} </span>
+            <span className="text-muted-foreground">{t('haveAccount')} </span>
             <Link
-              href={`/${locale}/auth/signup`}
+              href={`/${locale}/auth/login`}
               className="font-medium text-primary hover:underline"
             >
-              {t('signUpLink')}
+              {t('signInLink')}
             </Link>
           </div>
+
+          <p className="text-xs text-center text-muted-foreground">
+            {t('termsNotice')}
+          </p>
         </CardContent>
       </Card>
     </div>

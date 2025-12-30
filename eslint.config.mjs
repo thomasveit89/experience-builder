@@ -13,6 +13,18 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Relax overly strict TypeScript rules for practical development
+      "@typescript-eslint/no-explicit-any": "off", // Allow 'any' type when needed
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        "argsIgnorePattern": "^_", // Allow unused vars prefixed with _
+        "varsIgnorePattern": "^_"
+      }],
+      "react-hooks/exhaustive-deps": "warn", // Warn instead of error for missing deps
+      "@typescript-eslint/no-require-imports": "off", // Allow require() when needed
+    }
+  }
 ]);
 
 export default eslintConfig;

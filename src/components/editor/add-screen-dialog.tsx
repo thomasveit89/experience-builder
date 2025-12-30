@@ -18,7 +18,6 @@ import { toast } from 'sonner';
 import { Loader2, MessageSquare, ListChecks, TextCursorInput, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { NodeType } from '@/types/flow';
 import { ImagePicker } from './image-picker';
-import { ImageData } from '@/types/assets';
 import { useTranslations } from 'next-intl';
 
 interface AddScreenDialogProps {
@@ -28,14 +27,6 @@ interface AddScreenDialogProps {
   insertAtIndex?: number;
   onAdded: (node: { id: string; type: NodeType; content: unknown }) => void;
 }
-
-const NODE_TYPE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  'hero': MessageSquare,
-  'choice': ListChecks,
-  'text-input': TextCursorInput,
-  'reveal': Sparkles,
-  'media': ImageIcon,
-};
 
 export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdded }: AddScreenDialogProps) {
   const t = useTranslations('editor.addScreen');
@@ -47,10 +38,10 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
 
   const [step, setStep] = useState<'select-type' | 'fill-form'>('select-type');
   const [selectedType, setSelectedType] = useState<NodeType | null>(null);
-  const [content, setContent] = useState<any>({});
+  const [content, setContent] = useState<Record<string, unknown>>({});
   const [saving, setSaving] = useState(false);
 
-  const NODE_TYPES: Array<{ type: NodeType; icon: any }> = [
+  const NODE_TYPES: Array<{ type: NodeType; icon: React.ComponentType<{ className?: string }> }> = [
     { type: 'hero' as NodeType, icon: MessageSquare },
     { type: 'choice' as NodeType, icon: ListChecks },
     { type: 'text-input' as NodeType, icon: TextCursorInput },
@@ -102,7 +93,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
     setStep('fill-form');
   };
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: unknown) => {
     setContent({ ...content, [field]: value });
   };
 
@@ -113,7 +104,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         break;
       case 'choice':
         if (!content.question?.trim()) return tValidation('questionRequired');
-        const validOptions = content.options?.filter((o: any) => o.label.trim());
+        const validOptions = (content.options as Array<{ label: string }>)?.filter((o) => o.label.trim());
         if (!validOptions || validOptions.length < 2) return tValidation('minOptions');
         break;
       case 'text-input':
@@ -228,7 +219,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                   </Button>
                 )}
               </div>
-              {content.options?.map((option: any, index: number) => (
+              {(content.options as Array<{ id: string; label: string }>)?.map((option, index: number) => (
                 <div key={option.id} className="flex gap-2">
                   <Input
                     value={option.label}

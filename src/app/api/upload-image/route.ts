@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Validate file type
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type as any)) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
       return NextResponse.json(
         { error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed' },
         { status: 400 }
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       : `${user.id}/temp/${timestamp}_${sanitizedFileName}`;
 
     // 7. Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('project-assets')
       .upload(storagePath, arrayBuffer, {
         contentType: file.type,

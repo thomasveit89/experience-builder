@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
@@ -21,7 +20,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const supabase = createClient();
 
   const handleMagicLink = async (e: React.FormEvent) => {

@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Loader2, Send, Sparkles } from 'lucide-react';
 import { generateFlowAction } from '@/app/actions/generate-flow';
 import { useRouter, useParams } from 'next/navigation';
@@ -174,7 +173,7 @@ export function ChatInterface() {
         // Navigate to project editor
         router.push(`/${locale}/dashboard/projects/${result.projectId}`);
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred. Please try again.');
       setLoading(false);
     }
@@ -402,13 +401,12 @@ function CategorySection({ category, categoryLabel, examples, onExampleClick, ge
 interface ExampleCardProps {
   example: ExamplePrompt;
   onClick: () => void;
-  getThemeColors: (theme: Theme) => any;
+  getThemeColors: (theme: Theme) => { primary: string; accent: string; muted: string };
   getThemeDisplayName: (theme: Theme) => string;
-  tExamples: any;
+  tExamples: (key: string) => string;
 }
 
-function ExampleCard({ example, onClick, getThemeColors, getThemeDisplayName, tExamples }: ExampleCardProps) {
-  const themeColors = getThemeColors(example.theme);
+function ExampleCard({ example, onClick, tExamples }: ExampleCardProps) {
 
   return (
     <Card

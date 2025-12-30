@@ -35,7 +35,12 @@ export async function updateSessionAction(
   try {
     const supabase = await createClient();
 
-    const updateData: any = {
+    const updateData: {
+      answers: SessionAnswer[];
+      updated_at: string;
+      completed?: boolean;
+      completed_at?: string;
+    } = {
       answers,
       updated_at: new Date().toISOString(),
     };

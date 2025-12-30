@@ -24,7 +24,7 @@ function checkMagicNumber(buffer: ArrayBuffer, mimeType: string): boolean {
   return validPrefixes.some((prefix) => hex.startsWith(prefix));
 }
 
-async function getImageDimensions(buffer: ArrayBuffer): Promise<{ width: number; height: number } | null> {
+async function getImageDimensions(_buffer: ArrayBuffer): Promise<{ width: number; height: number } | null> {
   try {
     // For server-side, we'll use the sharp library if available
     // For now, return null and we can add sharp later
@@ -62,7 +62,7 @@ export async function uploadImageAction(formData: FormData): Promise<
     }
 
     // 4. Validate file type
-    if (!ALLOWED_IMAGE_TYPES.includes(file.type as any)) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type as (typeof ALLOWED_IMAGE_TYPES)[number])) {
       return { success: false, error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed' };
     }
 
@@ -80,7 +80,7 @@ export async function uploadImageAction(formData: FormData): Promise<
       : `${user.id}/temp/${timestamp}_${sanitizedFileName}`;
 
     // 7. Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('project-assets')
       .upload(storagePath, arrayBuffer, {
         contentType: file.type,

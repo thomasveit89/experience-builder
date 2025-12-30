@@ -43,10 +43,10 @@ export function DashboardNav({ user }: { user: User }) {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <LanguageSwitcher />
           <span className="text-sm text-muted-foreground hidden sm:inline">
             {user.email}
           </span>
+          <LanguageSwitcher />
           <Button variant="ghost" size="sm" onClick={handleSignOut}>
             {t('signOut')}
           </Button>

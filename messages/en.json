@@ -192,6 +192,65 @@
       "error": "Failed to update screen",
       "unknownType": "Unknown node type"
     },
+    "addScreen": {
+      "title": "Add New Screen",
+      "titleWithType": "Add {type}",
+      "description": "Choose the type of screen you want to add",
+      "descriptionWithPosition": "Fill in the details for your new screen (will be inserted at position {position})",
+      "descriptionWithoutPosition": "Fill in the details for your new screen",
+      "types": {
+        "hero": "Hero / Story",
+        "choice": "Multiple Choice",
+        "textInput": "Text Input",
+        "reveal": "Big Reveal",
+        "media": "Image Display"
+      },
+      "typeDescriptions": {
+        "hero": "Opening screen with headline and optional image",
+        "choice": "Question with 2-4 answer options",
+        "textInput": "Free-form text answer from recipient",
+        "reveal": "Surprise moment with confetti and optional CTA",
+        "media": "Full-screen image with caption"
+      },
+      "fields": {
+        "headline": "Headline *",
+        "headlinePlaceholder": "Enter headline...",
+        "body": "Body Text",
+        "bodyPlaceholder": "Enter body text...",
+        "backgroundImage": "Background Image (Optional)",
+        "question": "Question *",
+        "questionPlaceholder": "Enter question...",
+        "options": "Options (2-4 required) *",
+        "addOption": "Add Option",
+        "optionPlaceholder": "Option {number}",
+        "remove": "Remove",
+        "placeholder": "Placeholder",
+        "placeholderPlaceholder": "Enter placeholder text...",
+        "addCta": "Add Call-to-Action Button",
+        "ctaLabel": "Button Label",
+        "ctaLabelPlaceholder": "e.g., Get Your Gift",
+        "ctaUrl": "Button URL",
+        "ctaUrlPlaceholder": "https://...",
+        "image": "Image *",
+        "caption": "Caption (Optional)",
+        "captionPlaceholder": "Enter caption..."
+      },
+      "validation": {
+        "headlineRequired": "Headline is required",
+        "questionRequired": "Question is required",
+        "minOptions": "At least 2 options are required",
+        "imageRequired": "Image is required"
+      },
+      "buttons": {
+        "back": "Back",
+        "cancel": "Cancel",
+        "add": "Add Screen",
+        "adding": "Adding..."
+      },
+      "success": "Screen added at position {position}",
+      "successEnd": "Screen added at the end",
+      "error": "Failed to add screen"
+    },
     "publish": {
       "dialog": {
         "publishTitle": "Publish Your Gift?",

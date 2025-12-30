@@ -17,6 +17,7 @@ import { Check, Copy, ExternalLink, Loader2, Lock } from 'lucide-react';
 import { Project } from '@/types/flow';
 import { AlertDialogConfirm } from '@/components/ui/alert-dialog-confirm';
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 
 interface PublishDialogProps {
   open: boolean;
@@ -26,6 +27,8 @@ interface PublishDialogProps {
 }
 
 export function PublishDialog({ open, onClose, project, onPublished }: PublishDialogProps) {
+  const params = useParams();
+  const locale = (params.locale as string) || 'en';
   const t = useTranslations('editor.publish.dialog');
   const tToast = useTranslations('editor.publish.toast');
   const tCommon = useTranslations('common');
@@ -34,7 +37,7 @@ export function PublishDialog({ open, onClose, project, onPublished }: PublishDi
   const [showUnpublishDialog, setShowUnpublishDialog] = useState(false);
 
   const shareUrl = project.shareSlug
-    ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/play/${project.shareSlug}`
+    ? `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/${locale}/play/${project.shareSlug}`
     : null;
 
   const handlePublish = async () => {

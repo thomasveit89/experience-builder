@@ -19,6 +19,7 @@ import { Loader2, MessageSquare, ListChecks, TextCursorInput, Sparkles, Image as
 import { NodeType } from '@/types/flow';
 import { ImagePicker } from './image-picker';
 import { ImageData } from '@/types/assets';
+import { useTranslations } from 'next-intl';
 
 interface AddScreenDialogProps {
   open: boolean;
@@ -28,19 +29,34 @@ interface AddScreenDialogProps {
   onAdded: (node: any) => void;
 }
 
-const NODE_TYPES = [
-  { type: 'hero' as NodeType, label: 'Hero / Story', icon: MessageSquare, description: 'Opening screen with headline and optional image' },
-  { type: 'choice' as NodeType, label: 'Multiple Choice', icon: ListChecks, description: 'Question with 2-4 answer options' },
-  { type: 'text-input' as NodeType, label: 'Text Input', icon: TextCursorInput, description: 'Free-form text answer from recipient' },
-  { type: 'reveal' as NodeType, label: 'Big Reveal', icon: Sparkles, description: 'Surprise moment with confetti and optional CTA' },
-  { type: 'media' as NodeType, label: 'Image Display', icon: ImageIcon, description: 'Full-screen image with caption' },
-];
+const NODE_TYPE_ICONS: Record<string, any> = {
+  'hero': MessageSquare,
+  'choice': ListChecks,
+  'text-input': TextCursorInput,
+  'reveal': Sparkles,
+  'media': ImageIcon,
+};
 
 export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdded }: AddScreenDialogProps) {
+  const t = useTranslations('editor.addScreen');
+  const tTypes = useTranslations('editor.addScreen.types');
+  const tTypeDesc = useTranslations('editor.addScreen.typeDescriptions');
+  const tFields = useTranslations('editor.addScreen.fields');
+  const tValidation = useTranslations('editor.addScreen.validation');
+  const tButtons = useTranslations('editor.addScreen.buttons');
+
   const [step, setStep] = useState<'select-type' | 'fill-form'>('select-type');
   const [selectedType, setSelectedType] = useState<NodeType | null>(null);
   const [content, setContent] = useState<any>({});
   const [saving, setSaving] = useState(false);
+
+  const NODE_TYPES: Array<{ type: NodeType; icon: any }> = [
+    { type: 'hero' as NodeType, icon: MessageSquare },
+    { type: 'choice' as NodeType, icon: ListChecks },
+    { type: 'text-input' as NodeType, icon: TextCursorInput },
+    { type: 'reveal' as NodeType, icon: Sparkles },
+    { type: 'media' as NodeType, icon: ImageIcon },
+  ];
 
   const handleReset = () => {
     setStep('select-type');
@@ -93,21 +109,21 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
   const validateContent = (): string | null => {
     switch (selectedType) {
       case 'hero':
-        if (!content.headline?.trim()) return 'Headline is required';
+        if (!content.headline?.trim()) return tValidation('headlineRequired');
         break;
       case 'choice':
-        if (!content.question?.trim()) return 'Question is required';
+        if (!content.question?.trim()) return tValidation('questionRequired');
         const validOptions = content.options?.filter((o: any) => o.label.trim());
-        if (!validOptions || validOptions.length < 2) return 'At least 2 options are required';
+        if (!validOptions || validOptions.length < 2) return tValidation('minOptions');
         break;
       case 'text-input':
-        if (!content.question?.trim()) return 'Question is required';
+        if (!content.question?.trim()) return tValidation('questionRequired');
         break;
       case 'reveal':
-        if (!content.headline?.trim()) return 'Headline is required';
+        if (!content.headline?.trim()) return tValidation('headlineRequired');
         break;
       case 'media':
-        if (!content.image?.url) return 'Image is required';
+        if (!content.image?.url) return tValidation('imageRequired');
         break;
     }
     return null;
@@ -126,10 +142,13 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
 
     if (result.success) {
       onAdded(result.node);
-      toast.success(`Screen added ${insertAtIndex !== undefined ? `at position ${insertAtIndex + 1}` : 'at the end'}`);
+      const successMsg = insertAtIndex !== undefined
+        ? t('success', { position: insertAtIndex + 1 })
+        : t('successEnd');
+      toast.success(successMsg);
       handleClose();
     } else {
-      toast.error(result.error || 'Failed to add screen');
+      toast.error(result.error || t('error'));
     }
 
     setSaving(false);
@@ -143,29 +162,29 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="headline">Headline *</Label>
+              <Label htmlFor="headline">{tFields('headline')}</Label>
               <Input
                 id="headline"
                 value={content.headline || ''}
                 onChange={(e) => updateField('headline', e.target.value)}
                 maxLength={200}
-                placeholder="Enter headline..."
+                placeholder={tFields('headlinePlaceholder')}
                 autoFocus
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="body">Body Text</Label>
+              <Label htmlFor="body">{tFields('body')}</Label>
               <Textarea
                 id="body"
                 value={content.body || ''}
                 onChange={(e) => updateField('body', e.target.value)}
                 maxLength={1000}
                 rows={4}
-                placeholder="Enter body text..."
+                placeholder={tFields('bodyPlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Background Image (Optional)</Label>
+              <Label>{tFields('backgroundImage')}</Label>
               <ImagePicker
                 projectId={projectId}
                 value={content.backgroundImage}
@@ -179,19 +198,19 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="question">Question *</Label>
+              <Label htmlFor="question">{tFields('question')}</Label>
               <Input
                 id="question"
                 value={content.question || ''}
                 onChange={(e) => updateField('question', e.target.value)}
                 maxLength={200}
-                placeholder="Enter question..."
+                placeholder={tFields('questionPlaceholder')}
                 autoFocus
               />
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label>Options (2-4 required) *</Label>
+                <Label>{tFields('options')}</Label>
                 {content.options?.length < 4 && (
                   <Button
                     type="button"
@@ -205,7 +224,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                       updateField('options', newOptions);
                     }}
                   >
-                    Add Option
+                    {tFields('addOption')}
                   </Button>
                 )}
               </div>
@@ -218,7 +237,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                       newOptions[index] = { ...option, label: e.target.value };
                       updateField('options', newOptions);
                     }}
-                    placeholder={`Option ${index + 1}`}
+                    placeholder={tFields('optionPlaceholder', { number: index + 1 })}
                     maxLength={100}
                   />
                   {content.options.length > 2 && (
@@ -231,7 +250,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                         updateField('options', newOptions);
                       }}
                     >
-                      Remove
+                      {tFields('remove')}
                     </Button>
                   )}
                 </div>
@@ -244,24 +263,24 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="question">Question *</Label>
+              <Label htmlFor="question">{tFields('question')}</Label>
               <Input
                 id="question"
                 value={content.question || ''}
                 onChange={(e) => updateField('question', e.target.value)}
                 maxLength={200}
-                placeholder="Enter question..."
+                placeholder={tFields('questionPlaceholder')}
                 autoFocus
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="placeholder">Placeholder</Label>
+              <Label htmlFor="placeholder">{tFields('placeholder')}</Label>
               <Input
                 id="placeholder"
                 value={content.placeholder || ''}
                 onChange={(e) => updateField('placeholder', e.target.value)}
                 maxLength={100}
-                placeholder="Enter placeholder text..."
+                placeholder={tFields('placeholderPlaceholder')}
               />
             </div>
           </div>
@@ -271,29 +290,29 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="headline">Headline *</Label>
+              <Label htmlFor="headline">{tFields('headline')}</Label>
               <Input
                 id="headline"
                 value={content.headline || ''}
                 onChange={(e) => updateField('headline', e.target.value)}
                 maxLength={200}
-                placeholder="Enter headline..."
+                placeholder={tFields('headlinePlaceholder')}
                 autoFocus
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="body">Body Text</Label>
+              <Label htmlFor="body">{tFields('body')}</Label>
               <Textarea
                 id="body"
                 value={content.body || ''}
                 onChange={(e) => updateField('body', e.target.value)}
                 maxLength={1000}
                 rows={4}
-                placeholder="Enter body text..."
+                placeholder={tFields('bodyPlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Background Image (Optional)</Label>
+              <Label>{tFields('backgroundImage')}</Label>
               <ImagePicker
                 projectId={projectId}
                 value={content.backgroundImage}
@@ -314,28 +333,28 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                     }
                   }}
                 />
-                Add Call-to-Action Button
+                {tFields('addCta')}
               </Label>
               {content.cta && (
                 <div className="ml-6 space-y-3">
                   <div className="space-y-2">
-                    <Label htmlFor="ctaLabel">Button Label</Label>
+                    <Label htmlFor="ctaLabel">{tFields('ctaLabel')}</Label>
                     <Input
                       id="ctaLabel"
                       value={content.cta.label || ''}
                       onChange={(e) => updateField('cta', { ...content.cta, label: e.target.value })}
                       maxLength={50}
-                      placeholder="e.g., Get Your Gift"
+                      placeholder={tFields('ctaLabelPlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="ctaUrl">Button URL</Label>
+                    <Label htmlFor="ctaUrl">{tFields('ctaUrl')}</Label>
                     <Input
                       id="ctaUrl"
                       type="url"
                       value={content.cta.url || ''}
                       onChange={(e) => updateField('cta', { ...content.cta, url: e.target.value })}
-                      placeholder="https://..."
+                      placeholder={tFields('ctaUrlPlaceholder')}
                     />
                   </div>
                 </div>
@@ -348,7 +367,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         return (
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label>Image *</Label>
+              <Label>{tFields('image')}</Label>
               <ImagePicker
                 projectId={projectId}
                 value={content.image}
@@ -356,14 +375,14 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="caption">Caption (Optional)</Label>
+              <Label htmlFor="caption">{tFields('caption')}</Label>
               <Textarea
                 id="caption"
                 value={content.caption || ''}
                 onChange={(e) => updateField('caption', e.target.value)}
                 maxLength={200}
                 rows={2}
-                placeholder="Enter caption..."
+                placeholder={tFields('captionPlaceholder')}
               />
             </div>
           </div>
@@ -374,19 +393,30 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
     }
   };
 
+  const getDialogTitle = () => {
+    if (step === 'select-type') {
+      return t('title');
+    }
+    const typeLabel = tTypes(selectedType as string);
+    return t('titleWithType', { type: typeLabel });
+  };
+
+  const getDialogDescription = () => {
+    if (step === 'select-type') {
+      return t('description');
+    }
+    if (insertAtIndex !== undefined) {
+      return t('descriptionWithPosition', { position: insertAtIndex + 1 });
+    }
+    return t('descriptionWithoutPosition');
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {step === 'select-type' ? 'Add New Screen' : `Add ${NODE_TYPES.find(t => t.type === selectedType)?.label}`}
-          </DialogTitle>
-          <DialogDescription>
-            {step === 'select-type'
-              ? 'Choose the type of screen you want to add'
-              : `Fill in the details for your new screen${insertAtIndex !== undefined ? ` (will be inserted at position ${insertAtIndex + 1})` : ''}`
-            }
-          </DialogDescription>
+          <DialogTitle>{getDialogTitle()}</DialogTitle>
+          <DialogDescription>{getDialogDescription()}</DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
@@ -394,6 +424,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
             <div className="grid gap-3">
               {NODE_TYPES.map((nodeType) => {
                 const Icon = nodeType.icon;
+                const typeKey = nodeType.type === 'text-input' ? 'textInput' : nodeType.type;
                 return (
                   <button
                     key={nodeType.type}
@@ -404,8 +435,8 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                       <Icon className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold mb-1">{nodeType.label}</h3>
-                      <p className="text-sm text-muted-foreground">{nodeType.description}</p>
+                      <h3 className="font-semibold mb-1">{tTypes(typeKey)}</h3>
+                      <p className="text-sm text-muted-foreground">{tTypeDesc(typeKey)}</p>
                     </div>
                   </button>
                 );
@@ -419,21 +450,21 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
         <DialogFooter>
           {step === 'fill-form' && (
             <Button variant="outline" onClick={() => setStep('select-type')} disabled={saving}>
-              Back
+              {tButtons('back')}
             </Button>
           )}
           <Button variant="outline" onClick={handleClose} disabled={saving}>
-            Cancel
+            {tButtons('cancel')}
           </Button>
           {step === 'fill-form' && (
             <Button onClick={handleSave} disabled={saving}>
               {saving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Adding...
+                  {tButtons('adding')}
                 </>
               ) : (
-                'Add Screen'
+                tButtons('add')
               )}
             </Button>
           )}

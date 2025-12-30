@@ -192,6 +192,65 @@
       "error": "Fehler beim Aktualisieren des Screens",
       "unknownType": "Unbekannter Node-Typ"
     },
+    "addScreen": {
+      "title": "Neuen Screen hinzufügen",
+      "titleWithType": "{type} hinzufügen",
+      "description": "Wähle den Typ des Screens, den du hinzufügen möchtest",
+      "descriptionWithPosition": "Fülle die Details für deinen neuen Screen aus (wird an Position {position} eingefügt)",
+      "descriptionWithoutPosition": "Fülle die Details für deinen neuen Screen aus",
+      "types": {
+        "hero": "Hero / Story",
+        "choice": "Multiple Choice",
+        "textInput": "Texteingabe",
+        "reveal": "Große Enthüllung",
+        "media": "Bildanzeige"
+      },
+      "typeDescriptions": {
+        "hero": "Eröffnungsscreen mit Überschrift und optionalem Bild",
+        "choice": "Frage mit 2-4 Antwortoptionen",
+        "textInput": "Freitextantwort vom Empfänger",
+        "reveal": "Überraschungsmoment mit Konfetti und optionalem CTA",
+        "media": "Vollbild-Bild mit Beschriftung"
+      },
+      "fields": {
+        "headline": "Überschrift *",
+        "headlinePlaceholder": "Überschrift eingeben...",
+        "body": "Fließtext",
+        "bodyPlaceholder": "Fließtext eingeben...",
+        "backgroundImage": "Hintergrundbild (Optional)",
+        "question": "Frage *",
+        "questionPlaceholder": "Frage eingeben...",
+        "options": "Optionen (2-4 erforderlich) *",
+        "addOption": "Option hinzufügen",
+        "optionPlaceholder": "Option {number}",
+        "remove": "Entfernen",
+        "placeholder": "Platzhalter",
+        "placeholderPlaceholder": "Platzhaltertext eingeben...",
+        "addCta": "Call-to-Action-Button hinzufügen",
+        "ctaLabel": "Button-Text",
+        "ctaLabelPlaceholder": "z.B. Hol dir dein Geschenk",
+        "ctaUrl": "Button-URL",
+        "ctaUrlPlaceholder": "https://...",
+        "image": "Bild *",
+        "caption": "Bildunterschrift (Optional)",
+        "captionPlaceholder": "Bildunterschrift eingeben..."
+      },
+      "validation": {
+        "headlineRequired": "Überschrift ist erforderlich",
+        "questionRequired": "Frage ist erforderlich",
+        "minOptions": "Mindestens 2 Optionen sind erforderlich",
+        "imageRequired": "Bild ist erforderlich"
+      },
+      "buttons": {
+        "back": "Zurück",
+        "cancel": "Abbrechen",
+        "add": "Screen hinzufügen",
+        "adding": "Wird hinzugefügt..."
+      },
+      "success": "Screen an Position {position} hinzugefügt",
+      "successEnd": "Screen am Ende hinzugefügt",
+      "error": "Fehler beim Hinzufügen des Screens"
+    },
     "publish": {
       "dialog": {
         "publishTitle": "Geschenk veröffentlichen?",

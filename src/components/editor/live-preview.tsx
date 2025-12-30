@@ -123,13 +123,11 @@ function PreviewFrame({
   }
 
   // Dynamic imports using require (needed for preview isolation)
-  /* eslint-disable @typescript-eslint/no-require-imports */
   const { HeroScreen } = require('@/components/player/screens/hero-screen');
   const { ChoiceScreen } = require('@/components/player/screens/choice-screen');
   const { TextInputScreen } = require('@/components/player/screens/text-input-screen');
   const { RevealScreen } = require('@/components/player/screens/reveal-screen');
   const { MediaScreen } = require('@/components/player/screens/media-screen');
-  /* eslint-enable @typescript-eslint/no-require-imports */
 
   const renderScreen = () => {
     // Dummy handlers for preview mode
@@ -152,9 +150,7 @@ function PreviewFrame({
   };
 
   // Get theme colors as inline styles
-  /* eslint-disable @typescript-eslint/no-require-imports */
   const { themes } = require('@/config/themes');
-  /* eslint-enable @typescript-eslint/no-require-imports */
   const theme = themes[project.theme];
 
   const themeStyles = {

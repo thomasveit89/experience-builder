@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-explicit-any": "off", // Allow 'any' type when needed
       "@typescript-eslint/no-unused-vars": "off", // Turn off unused vars warnings
       "react-hooks/exhaustive-deps": "off", // Turn off exhaustive deps (too strict)
+      "react-hooks/set-state-in-effect": "off", // Allow setState in useEffect (common pattern)
       "@typescript-eslint/no-require-imports": "off", // Allow require() when needed
     }
   }

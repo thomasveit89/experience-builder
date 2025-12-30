@@ -28,16 +28,16 @@ export async function updateNodeAction(nodeId: string, content: Record<string, u
     // Collect old assetIds that were replaced (uploaded images only)
     const replacedAssetIds = new Set<string>();
     if (oldNode?.content) {
-      const oldContent = oldNode.content;
+      const oldContent = oldNode.content as any;
       // Check if backgroundImage was replaced
       if (oldContent.backgroundImage?.assetId && oldContent.backgroundImage?.source === 'upload') {
-        if (content.backgroundImage?.assetId !== oldContent.backgroundImage.assetId) {
+        if ((content as any).backgroundImage?.assetId !== oldContent.backgroundImage.assetId) {
           replacedAssetIds.add(oldContent.backgroundImage.assetId);
         }
       }
       // Check if image was replaced
       if (oldContent.image?.assetId && oldContent.image?.source === 'upload') {
-        if (content.image?.assetId !== oldContent.image.assetId) {
+        if ((content as any).image?.assetId !== oldContent.image.assetId) {
           replacedAssetIds.add(oldContent.image.assetId);
         }
       }
@@ -142,7 +142,7 @@ async function cleanupOrphanedAsset(
 
     // Check if any node still references this assetId
     const isStillReferenced = allNodes?.some((node: { content?: Record<string, unknown> }) => {
-      const content = node.content;
+      const content = node.content as any;
       return (
         content?.backgroundImage?.assetId === assetId ||
         content?.image?.assetId === assetId

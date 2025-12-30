@@ -98,8 +98,9 @@ export async function uploadImageAction(formData: FormData): Promise<
       .from('project-assets')
       .getPublicUrl(storagePath);
 
-    // 9. Get image dimensions (optional)
-    const dimensions = await getImageDimensions(arrayBuffer);
+    // 9. Get image dimensions (optional - commented out for now)
+    // const dimensions = await getImageDimensions(arrayBuffer);
+    const dimensions = null;
 
     // 10. Insert into assets table
     const assetData = {
@@ -110,8 +111,8 @@ export async function uploadImageAction(formData: FormData): Promise<
       file_name: file.name,
       file_size: file.size,
       mime_type: file.type,
-      width: dimensions?.width || null,
-      height: dimensions?.height || null,
+      width: (dimensions as any)?.width || null,
+      height: (dimensions as any)?.height || null,
       alt_text: altText || file.name,
       attribution: null,
     };

@@ -98,23 +98,24 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
   };
 
   const validateContent = (): string | null => {
+    const c = content as any;
     switch (selectedType) {
       case 'hero':
-        if (!content.headline?.trim()) return tValidation('headlineRequired');
+        if (!c.headline?.trim()) return tValidation('headlineRequired');
         break;
       case 'choice':
-        if (!content.question?.trim()) return tValidation('questionRequired');
-        const validOptions = (content.options as Array<{ label: string }>)?.filter((o) => o.label.trim());
+        if (!c.question?.trim()) return tValidation('questionRequired');
+        const validOptions = (c.options as Array<{ label: string }>)?.filter((o: any) => o.label.trim());
         if (!validOptions || validOptions.length < 2) return tValidation('minOptions');
         break;
       case 'text-input':
-        if (!content.question?.trim()) return tValidation('questionRequired');
+        if (!c.question?.trim()) return tValidation('questionRequired');
         break;
       case 'reveal':
-        if (!content.headline?.trim()) return tValidation('headlineRequired');
+        if (!c.headline?.trim()) return tValidation('headlineRequired');
         break;
       case 'media':
-        if (!content.image?.url) return tValidation('imageRequired');
+        if (!c.image?.url) return tValidation('imageRequired');
         break;
     }
     return null;
@@ -147,6 +148,8 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
 
   const renderForm = () => {
     if (!selectedType) return null;
+    // Cast to any for easier property access
+    const c = content as any;
 
     switch (selectedType) {
       case 'hero':
@@ -156,7 +159,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="headline">{tFields('headline')}</Label>
               <Input
                 id="headline"
-                value={content.headline || ''}
+                value={c.headline || ''}
                 onChange={(e) => updateField('headline', e.target.value)}
                 maxLength={200}
                 placeholder={tFields('headlinePlaceholder')}
@@ -167,7 +170,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="body">{tFields('body')}</Label>
               <Textarea
                 id="body"
-                value={content.body || ''}
+                value={c.body || ''}
                 onChange={(e) => updateField('body', e.target.value)}
                 maxLength={1000}
                 rows={4}
@@ -178,7 +181,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label>{tFields('backgroundImage')}</Label>
               <ImagePicker
                 projectId={projectId}
-                value={content.backgroundImage}
+                value={c.backgroundImage}
                 onSelect={(img) => updateField('backgroundImage', img)}
               />
             </div>
@@ -192,7 +195,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="question">{tFields('question')}</Label>
               <Input
                 id="question"
-                value={content.question || ''}
+                value={c.question || ''}
                 onChange={(e) => updateField('question', e.target.value)}
                 maxLength={200}
                 placeholder={tFields('questionPlaceholder')}
@@ -202,14 +205,14 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label>{tFields('options')}</Label>
-                {content.options?.length < 4 && (
+                {c.options?.length < 4 && (
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => {
                       const newOptions = [
-                        ...content.options,
+                        ...(content as any).options,
                         { id: crypto.randomUUID(), label: '' },
                       ];
                       updateField('options', newOptions);
@@ -224,20 +227,20 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                   <Input
                     value={option.label}
                     onChange={(e) => {
-                      const newOptions = [...content.options];
+                      const newOptions = [...(content as any).options];
                       newOptions[index] = { ...option, label: e.target.value };
                       updateField('options', newOptions);
                     }}
                     placeholder={tFields('optionPlaceholder', { number: index + 1 })}
                     maxLength={100}
                   />
-                  {content.options.length > 2 && (
+                  {c.options.length > 2 && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const newOptions = (content.options as Array<{ id: string; label: string }>).filter((_, i: number) => i !== index);
+                        const newOptions = (c.options as Array<{ id: string; label: string }>).filter((_, i: number) => i !== index);
                         updateField('options', newOptions);
                       }}
                     >
@@ -257,7 +260,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="question">{tFields('question')}</Label>
               <Input
                 id="question"
-                value={content.question || ''}
+                value={c.question || ''}
                 onChange={(e) => updateField('question', e.target.value)}
                 maxLength={200}
                 placeholder={tFields('questionPlaceholder')}
@@ -268,7 +271,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="placeholder">{tFields('placeholder')}</Label>
               <Input
                 id="placeholder"
-                value={content.placeholder || ''}
+                value={c.placeholder || ''}
                 onChange={(e) => updateField('placeholder', e.target.value)}
                 maxLength={100}
                 placeholder={tFields('placeholderPlaceholder')}
@@ -284,7 +287,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="headline">{tFields('headline')}</Label>
               <Input
                 id="headline"
-                value={content.headline || ''}
+                value={c.headline || ''}
                 onChange={(e) => updateField('headline', e.target.value)}
                 maxLength={200}
                 placeholder={tFields('headlinePlaceholder')}
@@ -295,7 +298,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="body">{tFields('body')}</Label>
               <Textarea
                 id="body"
-                value={content.body || ''}
+                value={c.body || ''}
                 onChange={(e) => updateField('body', e.target.value)}
                 maxLength={1000}
                 rows={4}
@@ -306,7 +309,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label>{tFields('backgroundImage')}</Label>
               <ImagePicker
                 projectId={projectId}
-                value={content.backgroundImage}
+                value={c.backgroundImage}
                 onSelect={(img) => updateField('backgroundImage', img)}
               />
             </div>
@@ -314,7 +317,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={!!content.cta}
+                  checked={!!c.cta}
                   onChange={(e) => {
                     if (e.target.checked) {
                       updateField('cta', { label: '', url: '' });
@@ -326,14 +329,14 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                 />
                 {tFields('addCta')}
               </Label>
-              {content.cta && (
+              {c.cta && (
                 <div className="ml-6 space-y-3">
                   <div className="space-y-2">
                     <Label htmlFor="ctaLabel">{tFields('ctaLabel')}</Label>
                     <Input
                       id="ctaLabel"
-                      value={content.cta.label || ''}
-                      onChange={(e) => updateField('cta', { ...content.cta, label: e.target.value })}
+                      value={c.cta.label || ''}
+                      onChange={(e) => updateField('cta', { ...(content as any).cta, label: e.target.value })}
                       maxLength={50}
                       placeholder={tFields('ctaLabelPlaceholder')}
                     />
@@ -343,8 +346,8 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
                     <Input
                       id="ctaUrl"
                       type="url"
-                      value={content.cta.url || ''}
-                      onChange={(e) => updateField('cta', { ...content.cta, url: e.target.value })}
+                      value={c.cta.url || ''}
+                      onChange={(e) => updateField('cta', { ...(content as any).cta, url: e.target.value })}
                       placeholder={tFields('ctaUrlPlaceholder')}
                     />
                   </div>
@@ -361,7 +364,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label>{tFields('image')}</Label>
               <ImagePicker
                 projectId={projectId}
-                value={content.image}
+                value={c.image}
                 onSelect={(img) => updateField('image', img)}
               />
             </div>
@@ -369,7 +372,7 @@ export function AddScreenDialog({ open, onClose, projectId, insertAtIndex, onAdd
               <Label htmlFor="caption">{tFields('caption')}</Label>
               <Textarea
                 id="caption"
-                value={content.caption || ''}
+                value={c.caption || ''}
                 onChange={(e) => updateField('caption', e.target.value)}
                 maxLength={200}
                 rows={2}

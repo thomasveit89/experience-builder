@@ -43,10 +43,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight">My Gifts</h1>
-          <p className="text-muted-foreground mt-2">
-            Create and manage your gift experiences
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">My Gifts</h1>
         </div>
         <Link href="/dashboard/new">
           <Button size="lg" className="gap-2">

@@ -13,6 +13,37 @@ export async function updateNodeAction(nodeId: string, content: any) {
 
     if (!user) return { error: 'Unauthorized' };
 
+    // Get the old node content to check for replaced images
+    const { data: oldNode, error: fetchError } = await supabase
+      .from('nodes')
+      .select('content, project_id')
+      .eq('id', nodeId)
+      .single();
+
+    if (fetchError) {
+      console.error('Update node: Failed to fetch node', fetchError);
+      return { error: 'Failed to fetch node' };
+    }
+
+    // Collect old assetIds that were replaced (uploaded images only)
+    const replacedAssetIds = new Set<string>();
+    if (oldNode?.content) {
+      const oldContent = oldNode.content;
+      // Check if backgroundImage was replaced
+      if (oldContent.backgroundImage?.assetId && oldContent.backgroundImage?.source === 'upload') {
+        if (content.backgroundImage?.assetId !== oldContent.backgroundImage.assetId) {
+          replacedAssetIds.add(oldContent.backgroundImage.assetId);
+        }
+      }
+      // Check if image was replaced
+      if (oldContent.image?.assetId && oldContent.image?.source === 'upload') {
+        if (content.image?.assetId !== oldContent.image.assetId) {
+          replacedAssetIds.add(oldContent.image.assetId);
+        }
+      }
+    }
+
+    // Update the node
     const { error } = await supabase
       .from('nodes')
       .update({ content, updated_at: new Date().toISOString() })
@@ -21,6 +52,11 @@ export async function updateNodeAction(nodeId: string, content: any) {
     if (error) {
       console.error('Update node error:', error);
       return { error: 'Failed to update node' };
+    }
+
+    // Clean up replaced assets
+    for (const assetId of replacedAssetIds) {
+      await cleanupOrphanedAsset(supabase, assetId, oldNode.project_id, user.id);
     }
 
     return { success: true };
@@ -39,6 +75,32 @@ export async function deleteNodeAction(nodeId: string, projectId: string) {
 
     if (!user) return { error: 'Unauthorized' };
 
+    // First, get the node to check for uploaded images
+    const { data: nodeToDelete, error: fetchError } = await supabase
+      .from('nodes')
+      .select('content')
+      .eq('id', nodeId)
+      .single();
+
+    if (fetchError) {
+      console.error('Delete node: Failed to fetch node', fetchError);
+      return { error: 'Failed to fetch node' };
+    }
+
+    // Collect all assetIds from this node's content (uploaded images only)
+    const assetIds = new Set<string>();
+    if (nodeToDelete?.content) {
+      const content = nodeToDelete.content;
+      // Check common image fields
+      if (content.backgroundImage?.assetId && content.backgroundImage?.source === 'upload') {
+        assetIds.add(content.backgroundImage.assetId);
+      }
+      if (content.image?.assetId && content.image?.source === 'upload') {
+        assetIds.add(content.image.assetId);
+      }
+    }
+
+    // Delete the node
     const { error } = await supabase.from('nodes').delete().eq('id', nodeId);
 
     if (error) {
@@ -46,11 +108,93 @@ export async function deleteNodeAction(nodeId: string, projectId: string) {
       return { error: 'Failed to delete node' };
     }
 
+    // Clean up orphaned assets (uploaded images only)
+    for (const assetId of assetIds) {
+      await cleanupOrphanedAsset(supabase, assetId, projectId, user.id);
+    }
+
     revalidatePath(`/dashboard/projects/${projectId}`);
     return { success: true };
   } catch (error) {
     console.error('Delete node action error:', error);
     return { error: 'An unexpected error occurred' };
+  }
+}
+
+// Helper function to check if an asset is still referenced and delete if orphaned
+async function cleanupOrphanedAsset(
+  supabase: any,
+  assetId: string,
+  projectId: string,
+  userId: string
+) {
+  try {
+    // Get all nodes in this project
+    const { data: allNodes, error: fetchError } = await supabase
+      .from('nodes')
+      .select('content')
+      .eq('project_id', projectId);
+
+    if (fetchError) {
+      console.error('Cleanup: Failed to fetch nodes', fetchError);
+      return;
+    }
+
+    // Check if any node still references this assetId
+    const isStillReferenced = allNodes?.some((node: any) => {
+      const content = node.content;
+      return (
+        content?.backgroundImage?.assetId === assetId ||
+        content?.image?.assetId === assetId
+      );
+    });
+
+    if (isStillReferenced) {
+      console.log(`Asset ${assetId} is still referenced, keeping it`);
+      return;
+    }
+
+    // Asset is orphaned, safe to delete
+    console.log(`Asset ${assetId} is orphaned, deleting...`);
+
+    // Get asset metadata to find storage path
+    const { data: asset, error: assetError } = await supabase
+      .from('assets')
+      .select('storage_path, storage_bucket')
+      .eq('id', assetId)
+      .eq('user_id', userId)
+      .single();
+
+    if (assetError || !asset) {
+      console.error('Cleanup: Failed to fetch asset', assetError);
+      return;
+    }
+
+    // Delete from storage
+    const { error: storageError } = await supabase.storage
+      .from(asset.storage_bucket)
+      .remove([asset.storage_path]);
+
+    if (storageError) {
+      console.error('Cleanup: Failed to delete from storage', storageError);
+      // Continue to delete from database even if storage fails
+    }
+
+    // Delete from assets table
+    const { error: deleteError } = await supabase
+      .from('assets')
+      .delete()
+      .eq('id', assetId)
+      .eq('user_id', userId);
+
+    if (deleteError) {
+      console.error('Cleanup: Failed to delete asset record', deleteError);
+    } else {
+      console.log(`Asset ${assetId} deleted successfully`);
+    }
+  } catch (error) {
+    console.error('Cleanup asset error:', error);
+    // Don't throw - cleanup is best-effort
   }
 }
 
@@ -153,6 +297,18 @@ export async function deleteProjectAction(projectId: string) {
 
     if (!user) return { error: 'Unauthorized' };
 
+    // Get all assets for this project before deleting
+    const { data: assets, error: assetsError } = await supabase
+      .from('assets')
+      .select('id, storage_path, storage_bucket')
+      .eq('project_id', projectId)
+      .eq('user_id', user.id);
+
+    if (assetsError) {
+      console.error('Delete project: Failed to fetch assets', assetsError);
+      // Continue with project deletion even if we can't fetch assets
+    }
+
     // Delete project (cascade will delete nodes and sessions)
     const { error } = await supabase
       .from('projects')
@@ -163,6 +319,33 @@ export async function deleteProjectAction(projectId: string) {
     if (error) {
       console.error('Delete project error:', error);
       return { error: 'Failed to delete project' };
+    }
+
+    // Clean up all assets from storage
+    if (assets && assets.length > 0) {
+      for (const asset of assets) {
+        // Delete from storage
+        const { error: storageError } = await supabase.storage
+          .from(asset.storage_bucket)
+          .remove([asset.storage_path]);
+
+        if (storageError) {
+          console.error(`Failed to delete asset ${asset.id} from storage:`, storageError);
+          // Continue with other assets
+        }
+
+        // Delete from assets table
+        const { error: deleteError } = await supabase
+          .from('assets')
+          .delete()
+          .eq('id', asset.id)
+          .eq('user_id', user.id);
+
+        if (deleteError) {
+          console.error(`Failed to delete asset ${asset.id} from database:`, deleteError);
+        }
+      }
+      console.log(`Deleted ${assets.length} assets for project ${projectId}`);
     }
 
     revalidatePath('/dashboard');
@@ -273,8 +456,11 @@ export async function addNodeAction(
         }
       }
     } else {
-      // Append to end
-      targetOrderIndex = nodeCount;
+      // Append to end - use max order_index + 1 to avoid conflicts
+      const maxOrderIndex = existingNodes && existingNodes.length > 0
+        ? Math.max(...existingNodes.map(n => n.order_index))
+        : -1;
+      targetOrderIndex = maxOrderIndex + 1;
     }
 
     // Insert new node
@@ -291,7 +477,8 @@ export async function addNodeAction(
 
     if (insertError || !newNode) {
       console.error('Add node: Insert error', insertError);
-      return { error: 'Failed to create node' };
+      console.error('Add node: Insert details', { projectId, nodeType, targetOrderIndex, content });
+      return { error: `Failed to create node: ${insertError?.message || 'Unknown error'}` };
     }
 
     console.log(`Node added successfully at index ${targetOrderIndex}`);

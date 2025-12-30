@@ -79,7 +79,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 text-6xl">✨</div>
-          <CardTitle className="text-3xl font-bold">Experience Builder</CardTitle>
+          <CardTitle className="text-3xl font-bold">joyo</CardTitle>
           <CardDescription className="text-base mt-2">
             Create beautiful, emotional gift journeys
           </CardDescription>

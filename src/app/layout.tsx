@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Experience Builder - Create Emotional Gift Journeys",
+  title: "joyo - Create Emotional Gift Journeys",
   description: "Create beautiful, emotional gift experiences for proposals, announcements, surprises, and special moments.",
 };
 

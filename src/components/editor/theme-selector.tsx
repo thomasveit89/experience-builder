@@ -79,7 +79,6 @@ export function ThemeSelector({
                   <h3 className="font-semibold">{theme.label}</h3>
                   <p className="text-xs text-muted-foreground mt-1">{theme.description}</p>
                 </div>
-                {selectedTheme === key && <Check className="h-5 w-5 text-primary" />}
               </div>
 
               {/* Color palette preview */}

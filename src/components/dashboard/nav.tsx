@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { User } from '@supabase/supabase-js';
 
 export function DashboardNav({ user }: { user: User }) {
@@ -20,9 +21,14 @@ export function DashboardNav({ user }: { user: User }) {
     <nav className="border-b bg-card">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="font-bold text-xl flex items-center gap-2">
-            <span className="text-2xl">✨</span>
-            <span>Experience Builder</span>
+          <Link href="/dashboard" className="flex items-center">
+            <Image
+              src="/joyo.svg"
+              alt="Joyo"
+              width={63}
+              height={38}
+              priority
+            />
           </Link>
           <Link
             href="/dashboard"

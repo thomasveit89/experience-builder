@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import Link from 'next/link';
+import { BackButton } from '@/components/ui/back-button';
 
 export default async function TermsPage({
   params,
@@ -85,12 +85,9 @@ export default async function TermsPage({
           </div>
 
           <div className="mt-8 pt-8 border-t">
-            <Link
-              href={`/${locale}/auth/login`}
-              className="text-primary hover:underline"
-            >
+            <BackButton className="text-primary hover:underline">
               ← {t('backToLogin')}
-            </Link>
+            </BackButton>
           </div>
         </div>
       </div>

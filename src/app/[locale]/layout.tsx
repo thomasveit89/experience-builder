@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { Toaster } from "@/components/ui/sonner";
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n/config';
 import "../globals.css";
 
-export const metadata: Metadata = {
-  title: "joyo - Create Emotional Gift Journeys",
-  description: "Create beautiful, emotional gift experiences for proposals, announcements, surprises, and special moments.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'app.metadata' });
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

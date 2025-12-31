@@ -58,7 +58,7 @@ export function LivePreview({
           </div>
           <div className="flex-1 mx-4">
             <div className="h-6 bg-background rounded px-3 flex items-center text-xs text-muted-foreground">
-              gift.yourdomain.com/{project.shareSlug || 'preview'}
+              joyo.ch/{project.shareSlug || 'preview'}
             </div>
           </div>
         </div>

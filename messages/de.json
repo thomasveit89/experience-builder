@@ -1,7 +1,33 @@
 {
   "app": {
     "name": "joyo",
-    "tagline": "Erschaffe wunderschöne, emotionale Geschenkreisen"
+    "tagline": "Erschaffe wunderschöne, emotionale Geschenkreisen",
+    "metadata": {
+      "title": "joyo - Erschaffe emotionale Geschenkreisen",
+      "description": "Erschaffe wunderschöne, emotionale Geschenkerlebnisse für Heiratsanträge, Ankündigungen, Überraschungen und besondere Momente."
+    }
+  },
+  "landing": {
+    "hero": {
+      "headline": "Erschaffe emotionale Geschenkreisen, die Herzen berühren",
+      "subheadline": "Verwandle deine besonderen Momente in interaktive Geschichten mit KI. Perfekt für Heiratsanträge, Ankündigungen, Überraschungen und Feiern.",
+      "ctaPrimary": "Erstes Geschenk erstellen",
+      "ctaSecondary": "Beispiel ansehen"
+    },
+    "demo": {
+      "title": "Sieh es in Aktion",
+      "description": "Erlebe, wie deine Empfänger durch dein emotionales Geschenk reisen werden.",
+      "placeholder": "Demo-Reise wird hier angezeigt"
+    },
+    "cta": {
+      "headline": "Bereit, etwas Besonderes zu erschaffen?",
+      "subheadline": "Beginne in wenigen Minuten mit der Erstellung wunderschöner Geschenkerlebnisse",
+      "button": "Kostenlos starten"
+    },
+    "footer": {
+      "terms": "Nutzungsbedingungen",
+      "privacy": "Datenschutz"
+    }
   },
   "auth": {
     "login": {

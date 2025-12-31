@@ -1,7 +1,33 @@
 {
   "app": {
     "name": "joyo",
-    "tagline": "Create beautiful, emotional gift journeys"
+    "tagline": "Create beautiful, emotional gift journeys",
+    "metadata": {
+      "title": "joyo - Create Emotional Gift Journeys",
+      "description": "Create beautiful, emotional gift experiences for proposals, announcements, surprises, and special moments."
+    }
+  },
+  "landing": {
+    "hero": {
+      "headline": "Create Emotional Gift Journeys That Touch Hearts",
+      "subheadline": "Turn your special moments into interactive stories with AI. Perfect for proposals, announcements, surprises, and celebrations.",
+      "ctaPrimary": "Create Your First Gift",
+      "ctaSecondary": "See Example"
+    },
+    "demo": {
+      "title": "See It In Action",
+      "description": "Experience how your recipients will journey through your emotional gift.",
+      "placeholder": "Demo journey will appear here"
+    },
+    "cta": {
+      "headline": "Ready to Create Something Special?",
+      "subheadline": "Start creating beautiful gift experiences in minutes",
+      "button": "Get Started Free"
+    },
+    "footer": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    }
   },
   "auth": {
     "login": {

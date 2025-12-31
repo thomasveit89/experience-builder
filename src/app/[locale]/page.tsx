@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { LandingPage } from '@/components/landing/landing-page';
 
 export default async function Home({
   params
@@ -12,10 +13,11 @@ export default async function Home({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect to dashboard if logged in, otherwise to login
+  // Redirect to dashboard if logged in
   if (user) {
     redirect(`/${locale}/dashboard`);
-  } else {
-    redirect(`/${locale}/auth/login`);
   }
+
+  // Show landing page for guests
+  return <LandingPage locale={locale} />;
 }

@@ -26,7 +26,7 @@ export function HowItWorks({ locale }: HowItWorksProps) {
   const t = useTranslations('landing.howItWorks');
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-joyo-cream">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center mb-16">

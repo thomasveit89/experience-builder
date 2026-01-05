@@ -21,7 +21,7 @@ export function ExamplesGallery({ locale, examples }: ExamplesGalleryProps) {
   const t = useTranslations('landing.examples');
 
   return (
-    <section id="examples" className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section id="examples" className="py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
@@ -38,7 +38,7 @@ export function ExamplesGallery({ locale, examples }: ExamplesGalleryProps) {
           {examples.map((example) => (
             <div
               key={example.id}
-              className="group relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+              className="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border border-white/50"
             >
               {/* Thumbnail */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl bg-gradient-to-br from-joyo-peach to-joyo-cream">
